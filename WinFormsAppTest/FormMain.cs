@@ -1,7 +1,9 @@
 using System.ComponentModel;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
+using static System.Net.Mime.MediaTypeNames;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 
 namespace JardaCAD
@@ -14,10 +16,14 @@ namespace JardaCAD
         {
             InitializeComponent();
             //this.FormBorderStyle = FormBorderStyle.None; // no borders
-            //this.DoubleBuffered = true;
+            this.DoubleBuffered = true;
+
             this.SetStyle(ControlStyles.ResizeRedraw, true); // this is to avoid visual artifacts
             this.Padding = new Padding(borderSize);
             //this.BackColor = Color.FromArgb(98, 102, 244);
+
+            CanvasLayout();
+
 
         }
 
@@ -95,9 +101,12 @@ namespace JardaCAD
 
         private void FormMain_Load(object sender, EventArgs e)
         {
-             buttonExitApp.MouseClick += TitleBar.Mouse_Click_Exit;
-             buttonMaximazeApp.MouseClick += TitleBar.Mouse_Click_Maximaze;
-             buttonMinimazeAp.MouseClick += TitleBar.Mouse_Click_Minimize;
+            buttonExitApp.MouseClick += TitleBar.Mouse_Click_Exit;
+            buttonMaximazeApp.MouseClick += TitleBar.Mouse_Click_Maximaze;
+            buttonMinimazeAp.MouseClick += TitleBar.Mouse_Click_Minimize;
+
+
+            
         }
 
         private void FormMain_Resize(object sender, EventArgs e)
@@ -113,13 +122,103 @@ namespace JardaCAD
                     this.Padding = new Padding(7);
                     break;
                 case FormWindowState.Normal:
-                    if(this.Padding.Top != borderSize)
+                    if (this.Padding.Top != borderSize)
                     {
                         this.Padding = new Padding(borderSize);
-                    } 
+                    }
                     break;
 
             }
+        }
+
+        static void SetDoubleBuffer(Control ctrl, bool DoubleBuffered)
+        {
+            try
+            {
+                typeof(Control).InvokeMember("DoubleBuffered", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.SetProperty, null, ctrl, new object[] { DoubleBuffered });
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+        TableLayoutPanel Canvas;
+        private void CanvasLayout()
+        {
+            Canvas = new TableLayoutPanel();
+
+            SetDoubleBuffer(Canvas, true);
+
+            //Canvas.Dock = DockStyle.Bottom;
+            Canvas.Height = 100;
+            Canvas.Width = 500;
+            Canvas.BackColor = Color.White;
+            Canvas.Name = "Canvas";
+            Canvas.Location = new Point(0, 200);
+            Canvas.Anchor = AnchorStyles.Bottom | AnchorStyles.Right | AnchorStyles.Left;
+            Canvas.Dock = DockStyle.Fill;
+            Canvas.Paint += panelCanvas_Paint;
+            Canvas.MouseMove += panelCanvas_MouseMove;
+            this.Controls.Add(Canvas);
+
+        }
+
+
+        private void buttonDrawLine_Click(object sender, EventArgs e)
+        {
+
+
+            Drawing.point2 = new Point(500, 500);
+            Canvas.Paint += new PaintEventHandler(panelCanvas_Paint);
+
+            this.Refresh();
+
+        }
+
+
+        private void panelCanvas_Paint(object sender, PaintEventArgs e)
+        {
+            Drawing.DrawLinePoint(e);
+            Drawing.DrawMouseBox(e);
+        }
+
+        private void panelCanvas_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
+            {
+                //Drawing.test1 = e.Location;
+                //Console.WriteLine(Drawing.test1);
+
+                //Drawing.point2 = new Point(500, 500);
+                Drawing.point2 = e.Location;
+
+            }
+            if (e.Button == MouseButtons.Right)
+            {
+                //Drawing.test2 = e.Location;
+                //Drawing.point1 = new Point(300, 300);
+                Drawing.point1 = e.Location;
+
+
+            }
+            //panelCanvas.Paint += new PaintEventHandler(panelCanvas_Paint);
+
+            //this.Refresh();
+
+            //panelCanvas.Paint += new PaintEventHandler(panelCanvas_Paint);
+
+            this.Refresh();
+
+        }
+
+        private void panelCanvas_MouseMove(object sender, MouseEventArgs e)
+        {
+
+            Drawing.point1 = e.Location;
+
+            Canvas.Paint += new PaintEventHandler(panelCanvas_Paint);
+
+            this.Refresh();
         }
     }
 }

@@ -45,13 +45,9 @@
             buttonDrawLine = new Button();
             toolStrip1 = new ToolStrip();
             printDocument1 = new System.Drawing.Printing.PrintDocument();
-            tabControl1 = new TabControl();
-            tabPage1 = new TabPage();
-            tabPage2 = new TabPage();
             titleBar.SuspendLayout();
             panelControl.SuspendLayout();
             toolStrip1.SuspendLayout();
-            tabControl1.SuspendLayout();
             SuspendLayout();
             // 
             // titleBar
@@ -170,18 +166,6 @@
             toolStripDropDownButton1.Size = new Size(29, 22);
             toolStripDropDownButton1.Text = "toolStripDropDownButton1";
             // 
-            // dasToolStripMenuItem
-            // 
-            dasToolStripMenuItem.Name = "dasToolStripMenuItem";
-            dasToolStripMenuItem.Size = new Size(92, 22);
-            dasToolStripMenuItem.Text = "das";
-            // 
-            // asdToolStripMenuItem
-            // 
-            asdToolStripMenuItem.Name = "asdToolStripMenuItem";
-            asdToolStripMenuItem.Size = new Size(92, 22);
-            asdToolStripMenuItem.Text = "asd";
-            // 
             // panelControl
             // 
             panelControl.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
@@ -211,6 +195,7 @@
             buttonDrawLine.Text = "Line";
             buttonDrawLine.TextAlign = ContentAlignment.BottomCenter;
             buttonDrawLine.UseVisualStyleBackColor = true;
+            buttonDrawLine.Click += buttonDrawLine_Click;
             // 
             // toolStrip1
             // 
@@ -221,41 +206,6 @@
             toolStrip1.TabIndex = 0;
             toolStrip1.Text = "toolStrip1";
             // 
-            // tabControl1
-            // 
-            tabControl1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            tabControl1.Controls.Add(tabPage1);
-            tabControl1.Controls.Add(tabPage2);
-            tabControl1.Font = new Font("Segoe UI", 12F);
-            tabControl1.HotTrack = true;
-            tabControl1.Location = new Point(1, 139);
-            tabControl1.Multiline = true;
-            tabControl1.Name = "tabControl1";
-            tabControl1.Padding = new Point(0, 0);
-            tabControl1.SelectedIndex = 0;
-            tabControl1.Size = new Size(1335, 639);
-            tabControl1.TabIndex = 2;
-            // 
-            // tabPage1
-            // 
-            tabPage1.Location = new Point(4, 30);
-            tabPage1.Name = "tabPage1";
-            tabPage1.Padding = new Padding(3);
-            tabPage1.Size = new Size(1327, 605);
-            tabPage1.TabIndex = 0;
-            tabPage1.Text = "tabPage1";
-            tabPage1.UseVisualStyleBackColor = true;
-            // 
-            // tabPage2
-            // 
-            tabPage2.Location = new Point(4, 30);
-            tabPage2.Name = "tabPage2";
-            tabPage2.Padding = new Padding(3);
-            tabPage2.Size = new Size(1327, 605);
-            tabPage2.TabIndex = 1;
-            tabPage2.Text = "tabPage2";
-            tabPage2.UseVisualStyleBackColor = true;
-            // 
             // FormMain
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -263,7 +213,6 @@
             AutoValidate = AutoValidate.EnableAllowFocusChange;
             BackColor = Color.FromArgb(50, 50, 50);
             ClientSize = new Size(1334, 776);
-            Controls.Add(tabControl1);
             Controls.Add(panelControl);
             Controls.Add(titleBar);
             DoubleBuffered = true;
@@ -275,7 +224,6 @@
             panelControl.ResumeLayout(false);
             toolStrip1.ResumeLayout(false);
             toolStrip1.PerformLayout();
-            tabControl1.ResumeLayout(false);
             ResumeLayout(false);
         }
 
@@ -296,8 +244,5 @@
         private ToolStrip toolStrip1;
         private Button buttonDrawLine;
         private System.Drawing.Printing.PrintDocument printDocument1;
-        private TabControl tabControl1;
-        private TabPage tabPage1;
-        private TabPage tabPage2;
     }
 }
