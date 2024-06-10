@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace JardaCAD
 {
-    internal class TitleBar
+    internal class MainWindowControl
     {
 
         public static Point mouseLocation;
@@ -37,6 +37,8 @@ namespace JardaCAD
                 //Program.mainForm.WindowState = FormWindowState.Maximized;
             }
         }
+
+
 
     }
 }

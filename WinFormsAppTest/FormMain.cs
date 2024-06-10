@@ -11,6 +11,7 @@ namespace JardaCAD
     public partial class FormMain : Form
     {
         readonly private int borderSize = 2;
+        Canvas canvas = new Canvas();
 
         public FormMain()
         {
@@ -21,18 +22,12 @@ namespace JardaCAD
             this.SetStyle(ControlStyles.ResizeRedraw, true); // this is to avoid visual artifacts
             this.Padding = new Padding(borderSize);
             //this.BackColor = Color.FromArgb(98, 102, 244);
-
-            CanvasLayout();
-
-
         }
 
         [DllImport("user32.DLL", EntryPoint = "ReleaseCapture")]
         private extern static void ReleaseCapture();
-
         [DllImport("user32.DLL", EntryPoint = "SendMessage")]
         private extern static void SendMessage(System.IntPtr hWnd, int wMsg, int wParam, int lParam);
-
 
         private void titleBar_MouseDown(object sender, EventArgs e)
         {
@@ -40,10 +35,8 @@ namespace JardaCAD
             SendMessage(this.Handle, 0x112, 0xf012, 0);
         }
 
-
         protected override void WndProc(ref Message message)
         {
-
             const int WM_SYSCOMMAND = 0x0083;
             if (message.Msg == WM_SYSCOMMAND && message.WParam.ToInt32() == 1)
             {
@@ -66,7 +59,6 @@ namespace JardaCAD
                 else if (Right.Contains(cursor)) message.Result = (IntPtr)HTRIGHT;
                 else if (Bottom.Contains(cursor)) message.Result = (IntPtr)HTBOTTOM;
             }
-
         }
 
         protected override void OnPaint(PaintEventArgs e) // you can safely omit this method if you want
@@ -89,28 +81,20 @@ namespace JardaCAD
 
         const int borderWidth = 3; // you can rename this variable if you like
 
-        Rectangle Top { get { return new Rectangle(0, 0, this.ClientSize.Width, borderWidth); } }
-        Rectangle Left { get { return new Rectangle(0, 0, borderWidth, this.ClientSize.Height); } }
-        Rectangle Bottom { get { return new Rectangle(0, this.ClientSize.Height - borderWidth, this.ClientSize.Width, borderWidth); } }
-        Rectangle Right { get { return new Rectangle(this.ClientSize.Width - borderWidth, 0, borderWidth, this.ClientSize.Height); } }
+        new Rectangle Top { get { return new Rectangle(0, 0, this.ClientSize.Width, borderWidth); } }
+        new Rectangle Left { get { return new Rectangle(0, 0, borderWidth, this.ClientSize.Height); } }
+        new Rectangle Bottom { get { return new Rectangle(0, this.ClientSize.Height - borderWidth, this.ClientSize.Width, borderWidth); } }
+        new Rectangle Right { get { return new Rectangle(this.ClientSize.Width - borderWidth, 0, borderWidth, this.ClientSize.Height); } }
 
-        Rectangle TopLeft { get { return new Rectangle(0, 0, borderWidth, borderWidth); } }
+        static Rectangle TopLeft { get { return new Rectangle(0, 0, borderWidth, borderWidth); } }
         Rectangle TopRight { get { return new Rectangle(this.ClientSize.Width - borderWidth, 0, borderWidth, borderWidth); } }
         Rectangle BottomLeft { get { return new Rectangle(0, this.ClientSize.Height - borderWidth, borderWidth, borderWidth); } }
         Rectangle BottomRight { get { return new Rectangle(this.ClientSize.Width - borderWidth, this.ClientSize.Height - borderWidth, borderWidth, borderWidth); } }
 
-        private void FormMain_Load(object sender, EventArgs e)
-        {
-            buttonExitApp.MouseClick += TitleBar.Mouse_Click_Exit;
-            buttonMaximazeApp.MouseClick += TitleBar.Mouse_Click_Maximaze;
-            buttonMinimazeAp.MouseClick += TitleBar.Mouse_Click_Minimize;
-
-
-            
-        }
-
         private void FormMain_Resize(object sender, EventArgs e)
         {
+            int topBarheight = titleBar.Height + panelControl.Height;
+            canvas.setHeight(Height - topBarheight);
             AdjustForm();
         }
 
@@ -131,94 +115,40 @@ namespace JardaCAD
             }
         }
 
-        static void SetDoubleBuffer(Control ctrl, bool DoubleBuffered)
+        private void FormMain_Load(object sender, EventArgs e)
         {
-            try
-            {
-                typeof(Control).InvokeMember("DoubleBuffered", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.SetProperty, null, ctrl, new object[] { DoubleBuffered });
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
-        }
-        TableLayoutPanel Canvas;
-        private void CanvasLayout()
-        {
-            Canvas = new TableLayoutPanel();
+            buttonExitApp.MouseClick += MainWindowControl.Mouse_Click_Exit;
+            buttonMaximazeApp.MouseClick += MainWindowControl.Mouse_Click_Maximaze;
+            buttonMinimazeAp.MouseClick += MainWindowControl.Mouse_Click_Minimize;
 
-            SetDoubleBuffer(Canvas, true);
-
-            //Canvas.Dock = DockStyle.Bottom;
-            Canvas.Height = 100;
-            Canvas.Width = 500;
-            Canvas.BackColor = Color.White;
-            Canvas.Name = "Canvas";
-            Canvas.Location = new Point(0, 200);
-            Canvas.Anchor = AnchorStyles.Bottom | AnchorStyles.Right | AnchorStyles.Left;
-            Canvas.Dock = DockStyle.Fill;
-            Canvas.Paint += panelCanvas_Paint;
-            Canvas.MouseMove += panelCanvas_MouseMove;
-            this.Controls.Add(Canvas);
-
+            Program.mainForm.Controls.Add(canvas.MainCanvas);
         }
 
+        bool drawLine = false;
+        Point point = new Point(0, 0);  
+        Point point2 = new Point(542, 123);
 
         private void buttonDrawLine_Click(object sender, EventArgs e)
         {
+            drawLine = true;
+            point = new Point(point.X + 10, point.Y + 10);
+            point2 = new Point(point2.X + 20, point2.Y + 20);
 
+            Drawing.point2 = point;
+            Drawing.point1 = point2;
+            Drawing.test2 = new Point(700, 700);
 
-            Drawing.point2 = new Point(500, 500);
-            Canvas.Paint += new PaintEventHandler(panelCanvas_Paint);
 
             this.Refresh();
+            //Canvas.Invalidate();
+
+
 
         }
 
-
-        private void panelCanvas_Paint(object sender, PaintEventArgs e)
-        {
-            Drawing.DrawLinePoint(e);
-            Drawing.DrawMouseBox(e);
-        }
-
-        private void panelCanvas_MouseDown(object sender, MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Left)
-            {
-                //Drawing.test1 = e.Location;
-                //Console.WriteLine(Drawing.test1);
-
-                //Drawing.point2 = new Point(500, 500);
-                Drawing.point2 = e.Location;
-
-            }
-            if (e.Button == MouseButtons.Right)
-            {
-                //Drawing.test2 = e.Location;
-                //Drawing.point1 = new Point(300, 300);
-                Drawing.point1 = e.Location;
-
-
-            }
-            //panelCanvas.Paint += new PaintEventHandler(panelCanvas_Paint);
-
-            //this.Refresh();
-
-            //panelCanvas.Paint += new PaintEventHandler(panelCanvas_Paint);
-
-            this.Refresh();
-
-        }
-
-        private void panelCanvas_MouseMove(object sender, MouseEventArgs e)
+        private void pictureBox1_MouseMove(object sender, MouseEventArgs e)
         {
 
-            Drawing.point1 = e.Location;
-
-            Canvas.Paint += new PaintEventHandler(panelCanvas_Paint);
-
-            this.Refresh();
         }
     }
 }

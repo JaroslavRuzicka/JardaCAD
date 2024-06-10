@@ -62,7 +62,7 @@
             titleBar.Location = new Point(0, 0);
             titleBar.Margin = new Padding(0);
             titleBar.Name = "titleBar";
-            titleBar.Size = new Size(1334, 36);
+            titleBar.Size = new Size(1264, 36);
             titleBar.TabIndex = 1;
             titleBar.MouseDown += titleBar_MouseDown;
             // 
@@ -76,7 +76,7 @@
             buttonMinimazeAp.Font = new Font("Segoe UI", 12F);
             buttonMinimazeAp.ForeColor = SystemColors.ButtonHighlight;
             buttonMinimazeAp.ImageAlign = ContentAlignment.BottomCenter;
-            buttonMinimazeAp.Location = new Point(1231, -3);
+            buttonMinimazeAp.Location = new Point(1161, -3);
             buttonMinimazeAp.Name = "buttonMinimazeAp";
             buttonMinimazeAp.Size = new Size(36, 37);
             buttonMinimazeAp.TabIndex = 4;
@@ -92,7 +92,7 @@
             buttonMaximazeApp.FlatStyle = FlatStyle.Flat;
             buttonMaximazeApp.Font = new Font("Segoe UI", 12F);
             buttonMaximazeApp.ForeColor = Color.FromArgb(249, 245, 235);
-            buttonMaximazeApp.Location = new Point(1264, -3);
+            buttonMaximazeApp.Location = new Point(1194, -3);
             buttonMaximazeApp.Name = "buttonMaximazeApp";
             buttonMaximazeApp.Size = new Size(36, 37);
             buttonMaximazeApp.TabIndex = 3;
@@ -108,7 +108,7 @@
             buttonExitApp.FlatStyle = FlatStyle.Flat;
             buttonExitApp.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Pixel);
             buttonExitApp.ForeColor = Color.FromArgb(249, 245, 235);
-            buttonExitApp.Location = new Point(1297, -3);
+            buttonExitApp.Location = new Point(1227, -3);
             buttonExitApp.Name = "buttonExitApp";
             buttonExitApp.Size = new Size(38, 37);
             buttonExitApp.TabIndex = 2;
@@ -166,6 +166,16 @@
             toolStripDropDownButton1.Size = new Size(29, 22);
             toolStripDropDownButton1.Text = "toolStripDropDownButton1";
             // 
+            // dasToolStripMenuItem
+            // 
+            dasToolStripMenuItem.Name = "dasToolStripMenuItem";
+            dasToolStripMenuItem.Size = new Size(67, 22);
+            // 
+            // asdToolStripMenuItem
+            // 
+            asdToolStripMenuItem.Name = "asdToolStripMenuItem";
+            asdToolStripMenuItem.Size = new Size(67, 22);
+            // 
             // panelControl
             // 
             panelControl.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
@@ -174,7 +184,7 @@
             panelControl.Location = new Point(1, 36);
             panelControl.Margin = new Padding(0);
             panelControl.Name = "panelControl";
-            panelControl.Size = new Size(1332, 100);
+            panelControl.Size = new Size(1262, 100);
             panelControl.TabIndex = 1;
             // 
             // buttonDrawLine
@@ -208,11 +218,11 @@
             // 
             // FormMain
             // 
-            AutoScaleDimensions = new SizeF(7F, 15F);
-            AutoScaleMode = AutoScaleMode.Font;
+            AutoScaleDimensions = new SizeF(96F, 96F);
+            AutoScaleMode = AutoScaleMode.Dpi;
             AutoValidate = AutoValidate.EnableAllowFocusChange;
             BackColor = Color.FromArgb(50, 50, 50);
-            ClientSize = new Size(1334, 776);
+            ClientSize = new Size(1264, 985);
             Controls.Add(panelControl);
             Controls.Add(titleBar);
             DoubleBuffered = true;
