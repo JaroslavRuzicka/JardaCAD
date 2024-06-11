@@ -10,8 +10,7 @@ namespace JardaCAD
 {
     public partial class FormMain : Form
     {
-        readonly private int borderSize = 2;
-        Canvas canvas = new Canvas();
+        Canvas canvas = MainWindowControl.getCanvas;
 
         public FormMain()
         {
@@ -20,8 +19,9 @@ namespace JardaCAD
             this.DoubleBuffered = true;
 
             this.SetStyle(ControlStyles.ResizeRedraw, true); // this is to avoid visual artifacts
-            this.Padding = new Padding(borderSize);
+            this.Padding = new Padding(MainWindowControl.BorderSize);
             //this.BackColor = Color.FromArgb(98, 102, 244);
+
         }
 
         [DllImport("user32.DLL", EntryPoint = "ReleaseCapture")]
@@ -79,41 +79,24 @@ namespace JardaCAD
             HTBOTTOMLEFT = 16,
             HTBOTTOMRIGHT = 17;
 
-        const int borderWidth = 3; // you can rename this variable if you like
+        new Rectangle Top { get { return new Rectangle(0, 0, this.ClientSize.Width, MainWindowControl.BorderWidth); } }
+        new Rectangle Left { get { return new Rectangle(0, 0, MainWindowControl.BorderWidth, this.ClientSize.Height); } }
+        new Rectangle Bottom { get { return new Rectangle(0, this.ClientSize.Height - MainWindowControl.BorderWidth, this.ClientSize.Width, MainWindowControl.BorderWidth); } }
+        new Rectangle Right { get { return new Rectangle(this.ClientSize.Width - MainWindowControl.BorderWidth, 0, MainWindowControl.BorderWidth, this.ClientSize.Height); } }
 
-        new Rectangle Top { get { return new Rectangle(0, 0, this.ClientSize.Width, borderWidth); } }
-        new Rectangle Left { get { return new Rectangle(0, 0, borderWidth, this.ClientSize.Height); } }
-        new Rectangle Bottom { get { return new Rectangle(0, this.ClientSize.Height - borderWidth, this.ClientSize.Width, borderWidth); } }
-        new Rectangle Right { get { return new Rectangle(this.ClientSize.Width - borderWidth, 0, borderWidth, this.ClientSize.Height); } }
-
-        static Rectangle TopLeft { get { return new Rectangle(0, 0, borderWidth, borderWidth); } }
-        Rectangle TopRight { get { return new Rectangle(this.ClientSize.Width - borderWidth, 0, borderWidth, borderWidth); } }
-        Rectangle BottomLeft { get { return new Rectangle(0, this.ClientSize.Height - borderWidth, borderWidth, borderWidth); } }
-        Rectangle BottomRight { get { return new Rectangle(this.ClientSize.Width - borderWidth, this.ClientSize.Height - borderWidth, borderWidth, borderWidth); } }
+        static Rectangle TopLeft { get { return new Rectangle(0, 0, MainWindowControl.BorderWidth, MainWindowControl.BorderWidth); } }
+        Rectangle TopRight { get { return new Rectangle(this.ClientSize.Width - MainWindowControl.BorderWidth, 0, MainWindowControl.BorderWidth, MainWindowControl.BorderWidth); } }
+        Rectangle BottomLeft { get { return new Rectangle(0, this.ClientSize.Height - MainWindowControl.BorderWidth, MainWindowControl.BorderWidth, MainWindowControl.BorderWidth); } }
+        Rectangle BottomRight { get { return new Rectangle(this.ClientSize.Width - MainWindowControl.BorderWidth, this.ClientSize.Height - MainWindowControl.BorderWidth, MainWindowControl.BorderWidth, MainWindowControl.BorderWidth); } }
 
         private void FormMain_Resize(object sender, EventArgs e)
         {
             int topBarheight = titleBar.Height + panelControl.Height;
             canvas.setHeight(Height - topBarheight);
-            AdjustForm();
+            MainWindowControl.AdjustForm();
         }
 
-        private void AdjustForm()
-        {
-            switch (this.WindowState)
-            {
-                case FormWindowState.Maximized:
-                    this.Padding = new Padding(7);
-                    break;
-                case FormWindowState.Normal:
-                    if (this.Padding.Top != borderSize)
-                    {
-                        this.Padding = new Padding(borderSize);
-                    }
-                    break;
 
-            }
-        }
 
         private void FormMain_Load(object sender, EventArgs e)
         {
@@ -124,27 +107,19 @@ namespace JardaCAD
             Program.mainForm.Controls.Add(canvas.MainCanvas);
         }
 
-        bool drawLine = false;
-        Point point = new Point(0, 0);  
-        Point point2 = new Point(542, 123);
-
         private void buttonDrawLine_Click(object sender, EventArgs e)
         {
-            drawLine = true;
-            point = new Point(point.X + 10, point.Y + 10);
-            point2 = new Point(point2.X + 20, point2.Y + 20);
 
-            Drawing.point2 = point;
-            Drawing.point1 = point2;
-            Drawing.test2 = new Point(700, 700);
+            
+            canvas.CanvasState = Canvas.CanvasStateEnum.drawLine;
 
-
-            this.Refresh();
+            //this.Refresh();
             //Canvas.Invalidate();
 
 
 
         }
+
 
         private void pictureBox1_MouseMove(object sender, MouseEventArgs e)
         {

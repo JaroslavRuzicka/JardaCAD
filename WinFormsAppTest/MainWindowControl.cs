@@ -8,10 +8,28 @@ using System.Threading.Tasks;
 
 namespace JardaCAD
 {
-    internal class MainWindowControl
+    internal static class MainWindowControl
     {
 
         public static Point mouseLocation;
+
+        private static int borderSize = 2;
+        public static int BorderSize
+        {
+            get => borderSize;
+        }
+
+        private static int borderWidth = 3;
+        public static int BorderWidth
+        {
+            get => borderSize;
+        }
+
+        private static Canvas canvas = new Canvas();
+        public static Canvas getCanvas
+        {
+             get => canvas;
+        }
 
 
         public static void Mouse_Click_Exit(object sender, MouseEventArgs e)
@@ -38,7 +56,22 @@ namespace JardaCAD
             }
         }
 
+        public static void AdjustForm()
+        {
+            switch (Program.mainForm.WindowState)
+            {
+                case FormWindowState.Maximized:
+                    Program.mainForm.Padding = new Padding(7);
+                    break;
+                case FormWindowState.Normal:
+                    if (Program.mainForm.Padding.Top != borderSize)
+                    {
+                        Program.mainForm.Padding = new Padding(borderSize);
+                    }
+                    break;
 
+            }
+        }
 
     }
 }

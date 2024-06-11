@@ -12,6 +12,22 @@ namespace JardaCAD
 
         public TableLayoutPanel MainCanvas;
 
+        private CanvasStateEnum canvasState = CanvasStateEnum.selection;
+
+        public CanvasStateEnum CanvasState
+        {
+            get => canvasState;
+            set 
+            { 
+                canvasState = value; 
+            }
+        }
+
+        public enum CanvasStateEnum
+        {
+            selection,
+            drawLine,
+        }
 
         public Canvas()
         {
@@ -31,24 +47,31 @@ namespace JardaCAD
             this.MainCanvas.MouseMove += panelCanvas_MouseMove;
             this.MainCanvas.MouseClick += panelCanvas_MouseClick;
             this.MainCanvas.Paint += new PaintEventHandler(panelCanvas_Paint);
-            
 
         }
+
         public void setHeight(int height)
         {
             this.MainCanvas.Height = height;
         }
-        private void panelCanvas_MouseClick(object sender, MouseEventArgs e)
-        {
 
-        }
         private void panelCanvas_Paint(object sender, PaintEventArgs e)
         {
+            Line.UpdateLines(e);
 
-            Drawing.DrawLinePoint(e);
         }
 
-
+        private void panelCanvas_MouseClick(object sender, MouseEventArgs e)
+        {
+            switch (this.canvasState)
+            {
+                case CanvasStateEnum.drawLine:
+                    Line.DrawLine(e);
+                    break;
+                default:
+                    break;
+            }
+        }
 
         private void panelCanvas_MouseDown(object sender, MouseEventArgs e)
         {
@@ -57,13 +80,13 @@ namespace JardaCAD
 
         private void panelCanvas_MouseMove(object sender, MouseEventArgs e)
         {
-            Drawing.point1 = e.Location;
-            MainCanvas.Invalidate();
+            if (this.canvasState == CanvasStateEnum.drawLine && Line.LineState == Line.LineStateEnum.canvasClick)
+            {
+                //Line.curDrawnLine[1] = e.Location;
+                Line.point2 = e.Location;
+                MainCanvas.Invalidate();
+            }
         }
-
-        //e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
-        //e.Graphics.SmoothingMode = Syste .Drawing.Drawing2D.SmoothingMode.AntiAlias;
-
 
         static void SetDoubleBuffer(Control ctrl, bool DoubleBuffered)
         {
