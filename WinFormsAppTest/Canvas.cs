@@ -2,8 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Reflection.Metadata;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace JardaCAD
 {
@@ -13,6 +16,29 @@ namespace JardaCAD
         public TableLayoutPanel MainCanvas;
 
         private CanvasStateEnum canvasState = CanvasStateEnum.selection;
+        private CanvasStateEnum pausedCanvasState = CanvasStateEnum.selection;
+        private PointF origin = new PointF(0, 0);
+        private PointF panningOrigin = new PointF(0, 0);
+
+        #region Getters and setters
+        public PointF GetOriginCoordinates()
+        {
+            return origin;
+        }
+        public void SetOriginCoordinates(PointF point)
+        {
+            origin = point;
+        }
+
+        private float canvasScale = 1;
+        public void SetCanvasScale(float scale)
+        {
+            canvasScale = scale;
+        }
+        public float GetCanvasScale()
+        {
+            return canvasScale;
+        }
 
         public CanvasStateEnum CanvasState
         {
@@ -22,11 +48,13 @@ namespace JardaCAD
                 canvasState = value; 
             }
         }
-
+        #endregion
+        #region Canvas properties
         public enum CanvasStateEnum
         {
             selection,
             drawLine,
+            panning,
         }
 
         public Canvas()
@@ -35,7 +63,6 @@ namespace JardaCAD
 
             SetDoubleBuffer(this.MainCanvas, true);
 
-            //Canvas.Dock = DockStyle.Bottom;
             this.MainCanvas.Height = 150;
             this.MainCanvas.Width = 150;
             this.MainCanvas.BackColor = Color.BlanchedAlmond;
@@ -46,7 +73,10 @@ namespace JardaCAD
             this.MainCanvas.Paint += panelCanvas_Paint;
             this.MainCanvas.MouseMove += panelCanvas_MouseMove;
             this.MainCanvas.MouseClick += panelCanvas_MouseClick;
+            this.MainCanvas.MouseWheel += panelCanvas_MouseWheel;
             this.MainCanvas.Paint += new PaintEventHandler(panelCanvas_Paint);
+            this.MainCanvas.MouseUp += panelCanvas_MouseUp;
+            this.MainCanvas.MouseDown += panelCanvas_MouseDown;
 
         }
 
@@ -54,40 +84,128 @@ namespace JardaCAD
         {
             this.MainCanvas.Height = height;
         }
-
+        #endregion
+        #region Event listeners
         private void panelCanvas_Paint(object sender, PaintEventArgs e)
         {
+           
             Line.UpdateLines(e);
-
         }
 
         private void panelCanvas_MouseClick(object sender, MouseEventArgs e)
         {
-            switch (this.canvasState)
+            if (e.Button == MouseButtons.Left)
             {
-                case CanvasStateEnum.drawLine:
-                    Line.DrawLine(e);
-                    break;
-                default:
-                    break;
+                switch (this.canvasState)
+                {
+                    case CanvasStateEnum.drawLine:
+                        Line.DrawLine(e);
+                        break;
+                    default:
+                        break;
+                }
             }
+
         }
 
         private void panelCanvas_MouseDown(object sender, MouseEventArgs e)
         {
+            if (e.Button == MouseButtons.Right)
+            {
+                canvasState = CanvasStateEnum.panning;
+                ResetCanvasState();
+                MainCanvas.Invalidate();
+            }
 
+            if (e.Button == MouseButtons.Middle)
+            {
+                pausedCanvasState = canvasState;
+                canvasState = CanvasStateEnum.panning;
+                panningOrigin = e.Location;
+            }
+        }
+
+        private void panelCanvas_MouseUp(object sender, MouseEventArgs e)
+        {
+            if (canvasState == CanvasStateEnum.panning)
+            {
+                canvasState = pausedCanvasState;
+                //ResetCanvasState();
+                //Once I add option to draw different objects, think about changing this to 
+                //different thing
+                if (canvasState != CanvasStateEnum.drawLine)
+                {
+                    Line.point1 = new Point(0, 0);
+                    Line.point2 = new Point(0, 0);
+                }
+            }
         }
 
         private void panelCanvas_MouseMove(object sender, MouseEventArgs e)
         {
             if (this.canvasState == CanvasStateEnum.drawLine && Line.LineState == Line.LineStateEnum.canvasClick)
             {
-                //Line.curDrawnLine[1] = e.Location;
                 Line.point2 = e.Location;
-                MainCanvas.Invalidate();
+                
+            }else if(canvasState == CanvasStateEnum.panning)
+            {
+                float Xdif = e.Location.X - panningOrigin.X;
+                float Ydif = e.Location.Y - panningOrigin.Y;
+
+                PointF newOrigin = new PointF(
+                    GetOriginCoordinates().X + Xdif / canvasScale,
+                    GetOriginCoordinates().Y + Ydif / canvasScale
+                );
+
+                UpdateCurrentlyDrawnElement(Xdif / canvasScale, Ydif / canvasScale);
+
+                SetOriginCoordinates(newOrigin);
+                panningOrigin = e.Location;
             }
+            MainCanvas.Invalidate();
         }
 
+        private void UpdateCurrentlyDrawnElement(float Xdif, float Ydif)
+        {
+            Line.point2.X = Line.point2.X + Xdif * canvasScale;
+            Line.point2.Y = Line.point2.Y + Ydif * canvasScale;
+            Line.point1.X = Line.point1.X + Xdif * canvasScale;
+            Line.point1.Y = Line.point1.Y + Ydif * canvasScale;
+        }
+
+        private void panelCanvas_MouseWheel(object sender, MouseEventArgs e)
+        {
+            //Delta is scroll, one scroll on my mouse is value of 120 up or down,
+            //So each scaleValue is 20% up or down (1.2)
+            float scaleValue = e.Delta / 100f;
+
+            if(scaleValue > 0)
+            {
+                if (GetCanvasScale() >= 10)
+                {
+                    return;
+                }
+
+                float scale = GetCanvasScale() * scaleValue;
+                SetCanvasScale(scale);
+                Line.point1 = new PointF(Line.point1.X * scaleValue, Line.point1.Y * scaleValue);
+                MainCanvas.Invalidate();
+            }
+            else
+            {
+                if (GetCanvasScale() <= .001)
+                {
+                    return;
+                }
+                float scale = GetCanvasScale() / (scaleValue * -1);
+                SetCanvasScale(scale);
+                Line.point1 = new PointF(Line.point1.X / scaleValue * -1, Line.point1.Y / scaleValue * -1);
+                MainCanvas.Invalidate();
+            }
+
+        }
+        #endregion
+        #region Other methods
         static void SetDoubleBuffer(Control ctrl, bool DoubleBuffered)
         {
             try
@@ -100,5 +218,12 @@ namespace JardaCAD
             }
         }
 
+        public void ResetCanvasState()
+        {
+            CanvasState = CanvasStateEnum.selection;
+            Line.LineState = Line.LineStateEnum.buttonClick;
+        }
+
+        #endregion
     }
 }

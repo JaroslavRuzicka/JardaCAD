@@ -24,6 +24,8 @@ namespace JardaCAD
 
         }
 
+        #region Window Behavior
+
         [DllImport("user32.DLL", EntryPoint = "ReleaseCapture")]
         private extern static void ReleaseCapture();
         [DllImport("user32.DLL", EntryPoint = "SendMessage")]
@@ -61,7 +63,7 @@ namespace JardaCAD
             }
         }
 
-        protected override void OnPaint(PaintEventArgs e) // you can safely omit this method if you want
+        protected override void OnPaint(PaintEventArgs e)
         {
             e.Graphics.FillRectangle(Brushes.LightSlateGray, Top);
             e.Graphics.FillRectangle(Brushes.LightSlateGray, Left);
@@ -94,9 +96,10 @@ namespace JardaCAD
             int topBarheight = titleBar.Height + panelControl.Height;
             canvas.setHeight(Height - topBarheight);
             MainWindowControl.AdjustForm();
+
         }
 
-
+        #endregion
 
         private void FormMain_Load(object sender, EventArgs e)
         {
@@ -105,25 +108,17 @@ namespace JardaCAD
             buttonMinimazeAp.MouseClick += MainWindowControl.Mouse_Click_Minimize;
 
             Program.mainForm.Controls.Add(canvas.MainCanvas);
+            comboBoxScale.SelectedIndex = 0;
         }
 
-        private void buttonDrawLine_Click(object sender, EventArgs e)
+        private void DrawLineButton_Click(object sender, EventArgs e)
         {
-
-            
             canvas.CanvasState = Canvas.CanvasStateEnum.drawLine;
-
-            //this.Refresh();
-            //Canvas.Invalidate();
-
-
-
         }
 
-
-        private void pictureBox1_MouseMove(object sender, MouseEventArgs e)
+        private void testingButton_Click(object sender, EventArgs e)
         {
-
+            
         }
     }
 }

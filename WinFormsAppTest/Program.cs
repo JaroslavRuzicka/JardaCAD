@@ -7,6 +7,7 @@ namespace JardaCAD
         /// </summary>
         
         public static Form mainForm = new FormMain();
+
         [STAThread]
         static void Main()
         {

@@ -11,7 +11,7 @@ namespace JardaCAD
     internal static class MainWindowControl
     {
 
-        public static Point mouseLocation;
+        //public static Point mouseLocation;
 
         private static int borderSize = 2;
         public static int BorderSize
@@ -50,9 +50,6 @@ namespace JardaCAD
             else
             {
                 Program.mainForm.WindowState = FormWindowState.Normal;
-                //Program.mainForm.Width = windowWidth;
-                //Program.mainForm.Height = windowHeight;
-                //Program.mainForm.WindowState = FormWindowState.Maximized;
             }
         }
 

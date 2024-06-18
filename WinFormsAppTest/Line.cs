@@ -7,15 +7,16 @@ using System.Drawing;
 using System.Windows.Forms;
 using System.Runtime.CompilerServices;
 using System.CodeDom.Compiler;
+using System.ComponentModel;
 
 namespace JardaCAD
 {
     internal static class Line
     {
-        private static List<List<Point>> LineList = new ();
+        private static List<List<PointF>> LineList = new ();
 
-        private static Point point1 = new Point(0, 0);
-        public static Point point2 = new Point(0, 0);
+        public static PointF point1 = new PointF(0, 0);
+        public static PointF point2 = new PointF(0, 0);
         private static Canvas canvas = MainWindowControl.getCanvas;
 
         private static LineStateEnum lineState = LineStateEnum.buttonClick;
@@ -28,7 +29,6 @@ namespace JardaCAD
             }
         }
 
-
         public enum LineStateEnum
         {
             buttonClick,
@@ -38,6 +38,7 @@ namespace JardaCAD
 
         public static void DrawLine(MouseEventArgs e)
         {
+            float scale = canvas.GetCanvasScale();
 
             if (lineState == LineStateEnum.buttonClick)
             {
@@ -51,9 +52,21 @@ namespace JardaCAD
                 canvas.CanvasState = Canvas.CanvasStateEnum.selection; 
                 canvas.MainCanvas.Invalidate();
 
+                float originX = canvas.GetOriginCoordinates().X;
+                float originY = canvas.GetOriginCoordinates().Y;
 
-                //here add a scale value
-                List<Point> temp = new List<Point>{ point1, point2 };
+                PointF point1Adjusted = new PointF(
+                    (point1.X - originX * scale) / scale, 
+                    (point1.Y - originY * scale) / scale)
+                    ;
+                PointF point2Adjusted = new PointF(
+                    (point2.X - originX * scale) / scale, 
+                    (point2.Y - originY * scale) / scale
+                    );
+                point1 = new Point(0, 0);
+                point2 = new Point(0, 0);
+
+                List<PointF> temp = new List<PointF>{ point1Adjusted, point2Adjusted };
                 LineList.Add(temp);
             };
                 
@@ -68,32 +81,35 @@ namespace JardaCAD
 
             Pen pen = new Pen(Color.Black, 2);
 
+            float scale = canvas.GetCanvasScale();
+            float originX = canvas.GetOriginCoordinates().X;
+            float originY = canvas.GetOriginCoordinates().Y;
 
-            //for (int i = 0; i < LineList.Count; i++)
-            //{
-            //    e.Graphics.DrawLines(pen, LineList[0]);
-            //}
-            //e.Graphics.DrawLine(pen, curDrawnLine[0], curDrawnLine[1]);
             e.Graphics.DrawLine(pen, point1, point2);
-            try
-            {
-                //here add a scale value
-                foreach (List<Point> point in LineList) 
-                { 
-                    e.Graphics.DrawLine(pen, point[0], point[1]);
 
+            if (canvas.CanvasState == Canvas.CanvasStateEnum.selection)
+            { 
+                e.Graphics.Clear(canvas.MainCanvas.BackColor);
+            }
+            
+            if (LineList.Count != 0)
+            {
+                foreach (List<PointF> point in LineList) 
+                {
+                    PointF point1 = new PointF(
+                        (point[0].X + originX) * scale,
+                        (point[0].Y + originY) * scale
+                    );
+                    
+                    PointF point2 = new PointF(
+                        (point[1].X + originX) * scale,
+                        (point[1].Y + originY) * scale
+                    );
+
+                    e.Graphics.DrawLine(pen, point1, point2);
                 }
-
             }
-            catch
-            {
-
-            }
-
             e.Dispose();
-
         }
-
-
     }
 }
