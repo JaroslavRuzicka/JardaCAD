@@ -13,6 +13,7 @@ namespace JardaCAD
     internal class Canvas
     {
 
+
         public TableLayoutPanel MainCanvas;
 
         private CanvasStateEnum canvasState = CanvasStateEnum.selection;
@@ -88,8 +89,7 @@ namespace JardaCAD
         #region Event listeners
         private void panelCanvas_Paint(object sender, PaintEventArgs e)
         {
-           
-            Line.UpdateLines(e);
+            LineRendering.UpdateLines(e);
         }
 
         private void panelCanvas_MouseClick(object sender, MouseEventArgs e)
@@ -99,7 +99,7 @@ namespace JardaCAD
                 switch (this.canvasState)
                 {
                     case CanvasStateEnum.drawLine:
-                        Line.DrawLine(e);
+                        LineRendering.DrawLine(e);
                         break;
                     default:
                         break;
@@ -137,17 +137,17 @@ namespace JardaCAD
                 //different thing
                 if (canvasState != CanvasStateEnum.drawLine)
                 {
-                    Line.point1 = new Point(0, 0);
-                    Line.point2 = new Point(0, 0);
+                    LineRendering.point1 = new Point(0, 0);
+                    LineRendering.point2 = new Point(0, 0);
                 }
             }
         }
 
         private void panelCanvas_MouseMove(object sender, MouseEventArgs e)
         {
-            if (this.canvasState == CanvasStateEnum.drawLine && Line.LineState == Line.LineStateEnum.canvasClick)
+            if (this.canvasState == CanvasStateEnum.drawLine && LineRendering.LineState == LineRendering.LineStateEnum.canvasClick)
             {
-                Line.point2 = e.Location;
+                LineRendering.point2 = e.Location;
                 
             }else if(canvasState == CanvasStateEnum.panning)
             {
@@ -242,7 +242,7 @@ namespace JardaCAD
         public void ResetCanvasState()
         {
             CanvasState = CanvasStateEnum.selection;
-            Line.LineState = Line.LineStateEnum.buttonClick;
+            LineRendering.LineState = LineRendering.LineStateEnum.buttonClick;
         }
         #endregion
     }
