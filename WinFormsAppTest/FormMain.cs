@@ -118,7 +118,14 @@ namespace JardaCAD
 
         private void testingButton_Click(object sender, EventArgs e)
         {
-            
+
+        }
+
+        private void comboBoxScale_SelectedValueChanged(object sender, EventArgs e)
+        {
+            float value = float.Parse(comboBoxScale.Text);
+            canvas.SetCanvasScale(value);
+            canvas.MainCanvas.Invalidate();
         }
     }
 }

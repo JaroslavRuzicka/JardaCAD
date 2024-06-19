@@ -174,6 +174,7 @@
             comboBoxScale.Name = "comboBoxScale";
             comboBoxScale.Size = new Size(60, 23);
             comboBoxScale.TabIndex = 0;
+            comboBoxScale.SelectedValueChanged += comboBoxScale_SelectedValueChanged;
             // 
             // FormMain
             // 

@@ -106,6 +106,8 @@ namespace JardaCAD
                 }
             }
 
+//            MessageBox.Show(e.Location.ToString());
+
         }
 
         private void panelCanvas_MouseDown(object sender, MouseEventArgs e)
@@ -157,7 +159,6 @@ namespace JardaCAD
                     GetOriginCoordinates().Y + Ydif / canvasScale
                 );
 
-                UpdateCurrentlyDrawnElement(Xdif / canvasScale, Ydif / canvasScale);
 
                 SetOriginCoordinates(newOrigin);
                 panningOrigin = e.Location;
@@ -165,30 +166,37 @@ namespace JardaCAD
             MainCanvas.Invalidate();
         }
 
-        private void UpdateCurrentlyDrawnElement(float Xdif, float Ydif)
-        {
-            Line.point2.X = Line.point2.X + Xdif * canvasScale;
-            Line.point2.Y = Line.point2.Y + Ydif * canvasScale;
-            Line.point1.X = Line.point1.X + Xdif * canvasScale;
-            Line.point1.Y = Line.point1.Y + Ydif * canvasScale;
-        }
-
         private void panelCanvas_MouseWheel(object sender, MouseEventArgs e)
         {
             //Delta is scroll, one scroll on my mouse is value of 120 up or down,
             //So each scaleValue is 20% up or down (1.2)
             float scaleValue = e.Delta / 100f;
+            PointF origin = GetOriginCoordinates();
+            PointF mouseLocation = new PointF(e.Location.X + origin.X, e.Location.Y + origin.Y);
 
-            if(scaleValue > 0)
+
+            if (scaleValue > 0)
             {
                 if (GetCanvasScale() >= 10)
                 {
                     return;
                 }
-
                 float scale = GetCanvasScale() * scaleValue;
                 SetCanvasScale(scale);
-                Line.point1 = new PointF(Line.point1.X * scaleValue, Line.point1.Y * scaleValue);
+
+                PointF scaledUpMouseLocation = new PointF(
+                    mouseLocation.X * scaleValue, 
+                    mouseLocation.Y * scaleValue);
+                PointF diffMouseLocation = new PointF(
+                    scaledUpMouseLocation.X - mouseLocation.X, 
+                    scaledUpMouseLocation.Y - mouseLocation.Y);
+
+                PointF newOrigin = new PointF(
+                    origin.X - diffMouseLocation.X, 
+                    origin.Y - diffMouseLocation.Y);
+                
+                SetOriginCoordinates(newOrigin);
+
                 MainCanvas.Invalidate();
             }
             else
@@ -199,7 +207,20 @@ namespace JardaCAD
                 }
                 float scale = GetCanvasScale() / (scaleValue * -1);
                 SetCanvasScale(scale);
-                Line.point1 = new PointF(Line.point1.X / scaleValue * -1, Line.point1.Y / scaleValue * -1);
+
+                PointF scaledUpMouseLocation = new PointF(
+                    mouseLocation.X / scaleValue * -1, 
+                    mouseLocation.Y / scaleValue * -1);
+                PointF diffMouseLocation = new PointF(
+                    scaledUpMouseLocation.X - mouseLocation.X, 
+                    scaledUpMouseLocation.Y - mouseLocation.Y);
+
+                PointF newOrigin = new PointF(
+                    origin.X - diffMouseLocation.X, 
+                    origin.Y - diffMouseLocation.Y);
+
+                SetOriginCoordinates(newOrigin);
+
                 MainCanvas.Invalidate();
             }
 
@@ -223,7 +244,6 @@ namespace JardaCAD
             CanvasState = CanvasStateEnum.selection;
             Line.LineState = Line.LineStateEnum.buttonClick;
         }
-
         #endregion
     }
 }
