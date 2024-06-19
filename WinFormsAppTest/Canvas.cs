@@ -15,6 +15,7 @@ namespace JardaCAD
 
 
         public TableLayoutPanel MainCanvas;
+        SelectionBox SelectionBox = new ();
 
         private CanvasStateEnum canvasState = CanvasStateEnum.selection;
         private CanvasStateEnum pausedCanvasState = CanvasStateEnum.selection;
@@ -90,6 +91,7 @@ namespace JardaCAD
         private void panelCanvas_Paint(object sender, PaintEventArgs e)
         {
             LineRendering.UpdateLines(e);
+            SelectionBox.UpdateSelectionBox(e);
         }
 
         private void panelCanvas_MouseClick(object sender, MouseEventArgs e)
@@ -114,33 +116,51 @@ namespace JardaCAD
         {
             if (e.Button == MouseButtons.Right)
             {
-                canvasState = CanvasStateEnum.panning;
                 ResetCanvasState();
                 MainCanvas.Invalidate();
             }
 
-            if (e.Button == MouseButtons.Middle)
+            else if (e.Button == MouseButtons.Middle)
             {
                 pausedCanvasState = canvasState;
                 canvasState = CanvasStateEnum.panning;
                 panningOrigin = e.Location;
             }
+
+            else if (e.Button == MouseButtons.Left)
+            {
+                switch (canvasState)
+                {
+                    case CanvasStateEnum.selection:
+                        SelectionBox.Origin = e.Location;
+                        break;
+                }
+            }
+
+
         }
 
         private void panelCanvas_MouseUp(object sender, MouseEventArgs e)
         {
-            if (canvasState == CanvasStateEnum.panning)
+            
+            switch (canvasState)
             {
-                canvasState = pausedCanvasState;
-                //ResetCanvasState();
-                //Once I add option to draw different objects, think about changing this to 
-                //different thing
-                if (canvasState != CanvasStateEnum.drawLine)
-                {
-                    LineRendering.point1 = new Point(0, 0);
-                    LineRendering.point2 = new Point(0, 0);
-                }
+                case CanvasStateEnum.panning:
+                    canvasState = pausedCanvasState;
+                    //ResetCanvasState();
+                    //Once I add option to draw different objects, think about changing this to 
+                    //different thing
+                    if (canvasState != CanvasStateEnum.drawLine)
+                    {
+                        LineRendering.point1 = new Point(0, 0);
+                        LineRendering.point2 = new Point(0, 0);
+                    }
+                    break;
+                case CanvasStateEnum.selection:
+                    ResetCanvasState();
+                    break;
             }
+            
         }
 
         private void panelCanvas_MouseMove(object sender, MouseEventArgs e)
@@ -162,6 +182,10 @@ namespace JardaCAD
 
                 SetOriginCoordinates(newOrigin);
                 panningOrigin = e.Location;
+            }else if(canvasState == CanvasStateEnum.selection && e.Button == MouseButtons.Left)
+            {
+                SelectionBox.DrawSelectionBox(e);
+                //MessageBox.Show("a");
             }
             MainCanvas.Invalidate();
         }
@@ -243,6 +267,13 @@ namespace JardaCAD
         {
             CanvasState = CanvasStateEnum.selection;
             LineRendering.LineState = LineRendering.LineStateEnum.buttonClick;
+            LineRendering.point1 = new PointF(0, 0);
+            LineRendering.point2 = new PointF(0, 0);
+
+            SelectionBox.resetSelectionBox();
+
+            MainCanvas.Invalidate();
+
         }
         #endregion
     }
