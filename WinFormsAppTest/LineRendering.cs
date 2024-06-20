@@ -13,7 +13,7 @@ namespace JardaCAD
 {
     internal static class LineRendering
     {
-        private static List<Line> LineList = new ();
+        public static List<Line> LineList = new ();
 
         public static PointF point1 = new PointF(0, 0);
         public static PointF point2 = new PointF(0, 0);
@@ -77,7 +77,8 @@ namespace JardaCAD
 
                 line.Point1 = point1;
                 line.Point2 = point2Adjusted;
-
+                line.color = Color.Black;
+                line.Selection = Line.SelectionFlagEnum.notSelected;
 
                 point1 = new Point(0, 0);
                 point2 = new Point(0, 0);
@@ -94,7 +95,8 @@ namespace JardaCAD
             e.Graphics.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighQuality;
             e.Graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
 
-            Pen pen = new Pen(Color.Black, 2);
+            //Later change this to currently selected color
+            Pen currnetPen = new Pen(Color.Black, 2);
 
             float scale = canvas.GetCanvasScale();
             float originX = canvas.GetOriginCoordinates().X;
@@ -107,7 +109,7 @@ namespace JardaCAD
                     (point1.X + originX) * scale,
                     (point1.Y + originY) * scale
                 );
-                e.Graphics.DrawLine(pen, tempPoint1, point2);
+                e.Graphics.DrawLine(currnetPen, tempPoint1, point2);
             }
 
             if (canvas.CanvasState == Canvas.CanvasStateEnum.selection)
@@ -119,6 +121,17 @@ namespace JardaCAD
             {
                 foreach (var item in LineList) 
                 {
+                    Color color = Color.Empty;
+                    if (item.Selection == Line.SelectionFlagEnum.selected)
+                    {
+                        color = Color.Aqua;
+                    }
+                    else
+                    {
+                        color = item.color;
+
+                    }
+                    Pen pen = new Pen(color, 2);
 
                     PointF point1 = new PointF(
                         (item.Point1.X + originX) * scale,

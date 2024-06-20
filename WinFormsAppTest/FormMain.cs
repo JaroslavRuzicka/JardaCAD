@@ -119,6 +119,9 @@ namespace JardaCAD
         private void testingButton_Click(object sender, EventArgs e)
         {
 
+            SelectionBox.ResetSelection();
+            canvas.MainCanvas.Invalidate();
+            
         }
 
         private void comboBoxScale_SelectedValueChanged(object sender, EventArgs e)
@@ -126,6 +129,21 @@ namespace JardaCAD
             float value = float.Parse(comboBoxScale.Text);
             canvas.SetCanvasScale(value);
             canvas.MainCanvas.Invalidate();
+        }
+
+        private void FormMain_KeyDown(object sender, KeyEventArgs e)
+        {
+            MessageBox.Show("a");
+            if (e.KeyCode == Keys.Escape)
+            {
+                SelectionBox.ResetSelection();
+            }
+        }
+
+        private void FormMain_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            MessageBox.Show("a");
+
         }
     }
 }

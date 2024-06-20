@@ -190,6 +190,8 @@
             Name = "FormMain";
             SizeGripStyle = SizeGripStyle.Hide;
             Load += FormMain_Load;
+            KeyDown += FormMain_KeyDown;
+            KeyPress += FormMain_KeyPress;
             Resize += FormMain_Resize;
             titleBar.ResumeLayout(false);
             panelControl.ResumeLayout(false);
